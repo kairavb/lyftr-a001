@@ -87,17 +87,44 @@ def test_messages_listing_and_filters():
 def test_pagination_and_q():
     """
     Validate free-text search:
+      • Insert a message with 'Hello' in text
       • GET /messages?q=Hello
       • Ensure returned data contains messages whose "text"
         includes 'Hello'
     """
+    # Seed a message containing "Hello" in the text field
+    secret = os.environ.get("WEBHOOK_SECRET")
+    body = {
+        "message_id": "m_q_hello",
+        "from": "+911111111111",
+        "to": "+14155550100",
+        "ts": "2025-01-15T11:00:00Z",
+        "text": "Hello from test_pagination_and_q"
+    }
+    body_bytes = json.dumps(body).encode()
+    signature = hmac.new(
+        secret.encode(),
+        body_bytes,
+        hashlib.sha256
+    ).hexdigest()
 
+    # Insert via webhook so it goes through full validation + DB path
+    r_insert = client.post(
+        "/webhook",
+        data=body_bytes,
+        headers={
+            "X-Signature": signature,
+            "Content-Type": "application/json"
+        }
+    )
+    assert r_insert.status_code == 200
+
+    # Now test q filter
     r = client.get("/messages", params={"q": "Hello"})
     assert r.status_code == 200
-
     j = r.json()
 
-    # ensure substring match in text
+    # Ensure substring match in text
     assert any(
         "Hello" in (m.get("text") or "")
         for m in j["data"]
