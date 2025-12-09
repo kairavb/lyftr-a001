@@ -13,9 +13,6 @@
 #   - Webhook processing logs
 #   - Error and metrics logging
 #
-# The evaluator will verify:
-#   - JSON per line logs
-#   - Presence of fields like ts, level, method, path, status, latency_ms
 # --------------------------------------------------
 
 import logging
