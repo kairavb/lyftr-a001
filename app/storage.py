@@ -15,8 +15,6 @@
 #       - Deterministic ordering: ts ASC, message_id ASC
 #   ✔ Compute stats for /stats endpoint
 #
-# NOTE:
-#   No functionality has been changed — only clarity and structure.
 # --------------------------------------------------
 
 import aiosqlite
